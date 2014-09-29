@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from actas.models import Region, Provincia, Distrito, CentroVotacion, Mesa, Acta, DetalleActa, DiseñoActa, DetalleDiseñoActa, VotacionDistrital, VotacionProvincial, VotacionRegional
+from actas.models import Region, Provincia, Distrito, CentroVotacion, Mesa, Acta, DetalleActa, DisenioActa, DetalleDisenioActa, VotacionDistrital, VotacionProvincial, VotacionRegional
 from django.views.generic import TemplateView, ListView, DetailView
 from django.core import serializers
 from django.http import HttpResponse, HttpResponseRedirect
@@ -26,10 +26,10 @@ def acta(request, numero):
 	provincia = distrito.provincia
 	region = provincia.region
 	try:
-		diseño_acta = DiseñoActa.objects.get(distrito=distrito)
-	except DiseñoActa.DoesNotExist:
+		disenio_acta = DisenioActa.objects.get(distrito=distrito)
+	except DisenioActa.DoesNotExist:
 		return HttpResponseRedirect(reverse('admin:login'))
-	detalles = DetalleDiseñoActa.objects.filter(diseño_acta=diseño_acta)
+	detalles = DetalleDisenioActa.objects.filter(disenio_acta=disenio_acta)
 	
 	if request.method == 'POST':
 		votos_blancos_reg = request.POST['voto_blanco_reg']
@@ -103,7 +103,7 @@ def acta(request, numero):
 		mesa.save()
 		return HttpResponseRedirect(reverse('actas:mesa'))
 
-	context = {'distrito':distrito,'provincia':provincia,'region':region,'diseño_acta':diseño_acta,
+	context = {'distrito':distrito,'provincia':provincia,'region':region,'disenio_acta':disenio_acta,
 	'detalles':detalles,'mesa':mesa}
 	return render(request, 'actas/acta.html', context)
 
