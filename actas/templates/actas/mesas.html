@@ -1,0 +1,49 @@
+{% extends "actas/base.html" %}
+
+{% block main_content %}
+<table class="table table-striped">
+        <tbhead>
+            <tr>
+                <th>MESA</th>
+                <th>CENTRO VOTACION</th>
+                <th>DISTRITO</th>
+                <th>NRO ELECTORES</th>
+                <th>PROCESAMIENTO</th>
+                <th>VER</th>
+                <th>EDITAR</th>
+                <th>ELIMINAR</th>
+            </tr>
+        </tbhead>
+        <tbody>
+        {% for mesa in mesas %}
+            <tr>
+                <td>{{ mesa.numero }}</td>
+                <td>{{ mesa.centro_votacion }}</td>
+                <td>{{ mesa.centro_votacion.distrito }}</td>
+                <td>{{ mesa.total_electores  }}</td>
+                {% if mesa.procesada  %}
+                    <td>MESA PROCESADA</td>
+                {% else %}
+                    <td>MESA SIN PROCESAR</td>
+                {% endif %}                
+                <td>
+                    <a class="btn btn-small" href="#">
+                        <i class="icon-eye-open"></i>
+                    </a>
+                </td>
+                <td>
+                    <a class="btn btn-small" href="#">
+                        <i class="icon-pencil"></i>
+                    </a>
+                </td>
+                <td>
+                    <a class="btn btn-small" href="#">
+                        <i class="icon-trash"></i>
+                    </a>
+                </td>
+            </tr>        
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'actas:exportar_mesas' %}">Exportar a Excel</a>
+{% endblock main_content %}

@@ -1,0 +1,30 @@
+{% extends "actas/base.html" %}
+
+{% block main_content %}
+
+<table class="table table-striped">
+        <tbhead>
+            <tr>
+                <th>PARTIDO</th>
+                <th>DISTRITO</th>
+                <th>VOTACION</th>
+                <th>DETALLE</th>
+            </tr>
+        </tbhead>
+        <tbody>
+        {% for votos_partido in votos_partidos %}
+            <tr>
+                <td>{{ votos_partido.partido }}</td>
+                <td>{{ votos_partido.distrito }}</td>
+                <td>{{ votos_partido.votos }}</td>
+                <td>
+                    <a class="btn btn-small" href="#">
+                        <i class="icon-eye-open"></i>
+                    </a>
+                </td>
+            </tr>        
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'actas:exportar_reporte_distrital' distrito %}">Exportar a Excel</a>
+{% endblock main_content %}

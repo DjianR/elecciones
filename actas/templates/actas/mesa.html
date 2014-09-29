@@ -1,0 +1,32 @@
+{% extends "actas/base.html" %}
+
+{% block main_content %}
+
+	<form action="{% url 'actas:mesa' %}" method="post" class="form-control">
+		{% csrf_token %}
+		<legend>SELECCIONE LA MESA</legend>		
+		<div class="span4">
+		</div>
+		<div class="span4">
+			<div class="ui-widget">
+				<label for="mesas">Mesas: </label>
+				<input id="mesas" name="mesas">
+			</div>
+		</div>
+		<div class="span4">
+		</div>				
+	</form>
+
+{% endblock main_content %}
+
+{% block js %}
+	<script>
+		var mesas = []
+		{% for mesa in mesas %}
+		mesas.push("{{ mesa.numero }}")
+		{% endfor %}
+		$(function() {
+			$("#mesas").autocomplete({source: mesas});
+		});
+	</script>
+{% endblock js %}

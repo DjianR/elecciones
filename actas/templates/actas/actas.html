@@ -1,0 +1,43 @@
+{% extends "actas/base.html" %}
+
+{% block main_content %}
+<table class="table table-striped">
+        <tbhead>
+            <tr>
+                <th>MESA</th>
+                <th>TOTAL VOTOS REGIONAL</th>
+                <th>TOTAL VOTOS PROVINCIAL</th>
+                <th>TOTAL VOTOS DISTRITAL</th>
+                <th>VER</th>
+                <th>EDITAR</th>
+                <th>ELIMINAR</th>
+            </tr>
+        </tbhead>
+        <tbody>
+        {% for acta in actas %}
+            <tr>
+                <td>{{ acta.mesa }}</td>
+                <td>{{ acta.votos_emitidos_reg }}</td>
+                <td>{{ acta.votos_emitidos_prov }}</td>
+                <td>{{ acta.votos_emitidos_dis }}</td>
+                <td>
+                    <a class="btn btn-small" href="{% url 'actas:detalle_acta' acta.pk %}">
+                        <i class="icon-eye-open"></i>
+                    </a>
+                </td>
+                <td>
+                    <a class="btn btn-small" href="#">
+                        <i class="icon-pencil"></i>
+                    </a>
+                </td>
+                <td>
+                    <a class="btn btn-small" href="#">
+                        <i class="icon-trash"></i>
+                    </a>
+                </td>
+            </tr>        
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'actas:exportar_actas' %}">Exportar a Excel</a>
+{% endblock main_content %}
