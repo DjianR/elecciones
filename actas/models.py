@@ -102,15 +102,15 @@ class DetalleActa(models.Model):
     def __str__(self):
         return self.acta.mesa.numero+" "+self.partido.nombre
 
-class DiseñoActa(models.Model):
+class DisenioActa(models.Model):
 	nombre = models.CharField(max_length=50)
 	distrito = models.ForeignKey(Distrito)
 
 	def __str__(self):
 		return self.nombre
 
-class DetalleDiseñoActa(models.Model):
-    diseño_acta = models.ForeignKey(DiseñoActa)
+class DetalleDisenioActa(models.Model):
+    disenio_acta = models.ForeignKey(DisenioActa)
     partido = models.ForeignKey(Partido)
     distrital = models.BooleanField(default=False)
     provincial = models.BooleanField(default=False)
