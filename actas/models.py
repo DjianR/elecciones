@@ -21,7 +21,7 @@ class Provincia(models.Model):
 class Distrito(models.Model):
     nombre = models.CharField(max_length=80)
     provincia = models.ForeignKey(Provincia)
-    capital_provincia = models.BooleanField(default=False)
+    capital_provincia = models.BooleanField()
 
     def __str__(self):
         return self.nombre
