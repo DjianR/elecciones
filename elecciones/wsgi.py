@@ -15,6 +15,6 @@ from dj_static import Cling
 
 application = Cling(get_wsgi_application())
 
-import sys
+"""import sys
 reload(sys)     
-sys.setdefaultencoding("utf-8")
+sys.setdefaultencoding("utf-8")"""
