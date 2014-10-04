@@ -34,7 +34,7 @@
             <td>{{ acta.votos_emitidos_prov }}</td>
             <td>{{ acta.votos_emitidos_dis }}</td>
             <td>
-                <a class="btn btn-small" href="{% url 'actas:detalle_acta' acta.pk %}">
+                <a class="btn btn-small" href="{% url 'actas:detalle_acta_municipal' acta.pk %}">
                     <i class="icon-eye-open"></i>
                 </a>
             </td>
@@ -47,7 +47,7 @@
     {% endfor %}
     </tbody>    
 </table>
-<a href="{% url 'actas:exportar_actas' %}">Exportar a Excel</a>
+<a href="{% url 'actas:exportar_actas_municipales' %}">Exportar a Excel</a>
 <hr>
 <div>
     <span>

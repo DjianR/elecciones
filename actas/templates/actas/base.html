@@ -17,14 +17,28 @@
 					<div class="container">
 						<a href="#" class="brand">CENTRO DE COMPUTO ELECTORAL</a>
 						<ul class="nav pull-right">
-							<li><a href="{% url 'actas:mesa' %}">Ingresar Actas</a></li>
-							<li><a href="{% url 'actas:actas' %}">Actas</a></li>
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Ingresar Actas<b class="caret"></b></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="{% url 'actas:mesa_municipal' %}">Actas Municipales</a></li>
+									<li><a href="{% url 'actas:mesa_regional' %}">Actas Regionales</a></li>
+								</ul>
+							</li>
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Reporte de Actas<b class="caret"></b></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="{% url 'actas:actas_municipales' %}">Actas Municipales</a></li>
+									<li><a href="{% url 'actas:actas_regionales' %}">Actas Regionales</a></li>
+								</ul>
+							</li>							
 							<li><a href="{% url 'actas:mesas' %}">Mesas</a></li>
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Reportes<b class="caret"></b></a>
 								<ul class="dropdown-menu" role="menu">
-									<li><a href="{% url 'actas:seleccion_provincia' %}">Reporte Provincial</a></li>
-									<li><a href="{% url 'actas:seleccion_distrito' %}">Reporte Distrital</a></li>
+									<li><a href="{% url 'actas:seleccion_region' %}">Presidente Regional</a></li>
+									<li><a href="{% url 'actas:seleccion_prov_consejero' %}">Consejero Regional</a></li>
+									<li><a href="{% url 'actas:seleccion_provincia' %}">Municipalidad Provincial</a></li>
+									<li><a href="{% url 'actas:seleccion_distrito' %}">Municipalidad Distrital</a></li>
 								</ul>
 							</li>
 							<li class="divider-vertical"></li>

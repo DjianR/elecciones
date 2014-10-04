@@ -34,13 +34,21 @@ class Partido(models.Model):
 	def __str__(self):
 		return self.nombre
 
-class VotacionRegional(models.Model):
+class VotacionPresidenteRegional(models.Model):
 	partido = models.ForeignKey(Partido)
 	region = models.ForeignKey(Region)
 	votos = models.IntegerField(default=0)
 	
 	def __str__(self):
-		pass
+		return "%s - %s" % (self.partido, self.region)
+
+class VotacionConsejeroRegional(models.Model):
+	partido = models.ForeignKey(Partido)
+	provincia = models.ForeignKey(Provincia)
+	votos = models.IntegerField(default=0)
+	
+	def __str__(self):
+		return "%s - %s" % (self.partido, self.region)
 
 class VotacionProvincial(models.Model):
 	partido = models.ForeignKey(Partido)
@@ -48,7 +56,7 @@ class VotacionProvincial(models.Model):
 	votos = models.IntegerField(default=0)
 	
 	def __str__(self):
-		pass
+		return "%s - %s" % (self.partido, self.provincia)
 
 class VotacionDistrital(models.Model):
 	partido = models.ForeignKey(Partido)
@@ -57,10 +65,6 @@ class VotacionDistrital(models.Model):
 
 	def __str__(self):
 		return "%s - %s" % (self.partido, self.distrito)
-
-	def porcentaje(self, total):
-		porc = self.votos * 100 / total
-	
 
 class CentroVotacion(models.Model):
 	nombre = models.CharField(max_length=50)
@@ -73,12 +77,13 @@ class Mesa(models.Model):
 	numero = models.CharField(max_length=6, primary_key=True)
 	total_electores = models.IntegerField()
 	centro_votacion = models.ForeignKey(CentroVotacion)
-	procesada = models.BooleanField(default=False)
+	procesada_municipal = models.BooleanField(default=False)
+	procesada_regional = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.numero
 	
-class Acta(models.Model):
+class ActaMunicipal(models.Model):
 	mesa = models.ForeignKey(Mesa, primary_key=True)
 	votos_blancos_prov = models.IntegerField()
 	votos_blancos_dis = models.IntegerField()
@@ -100,8 +105,8 @@ class Acta(models.Model):
 	def __str__(self):
 		return self.mesa.numero
 
-class DetalleActa(models.Model):
-	acta = models.ForeignKey(Acta)
+class DetalleActaMunicipal(models.Model):
+	acta = models.ForeignKey(ActaMunicipal)
 	partido = models.ForeignKey(Partido)
 	votos_provincial = models.IntegerField()
 	votos_distrital = models.IntegerField()
@@ -112,18 +117,68 @@ class DetalleActa(models.Model):
 	def __str__(self):
 		return self.acta.mesa.numero+" "+self.partido.nombre
 
-class DisenioActa(models.Model):
+class ActaRegional(models.Model):
+	mesa = models.ForeignKey(Mesa, primary_key=True)
+	votos_blancos_pres = models.IntegerField()
+	votos_nulos_pres = models.IntegerField()
+	votos_impugnados_pres = models.IntegerField()
+	votos_emitidos_pres = models.IntegerField()
+	votos_blancos_cons = models.IntegerField()
+	votos_nulos_cons = models.IntegerField()
+	votos_impugnados_cons = models.IntegerField()
+	votos_emitidos_cons = models.IntegerField()
+
+	def votos_validos_pres(self):
+		vvp = self.votos_emitidos_pres - self.votos_impugnados_pres - self.votos_nulos_pres - self.votos_blancos_pres
+		return vvp
+
+	def votos_validos_cons(self):
+		vvc = self.votos_emitidos_cons - self.votos_impugnados_cons - self.votos_nulos_cons - self.votos_blancos_cons
+		return vvc
+
+	def __str__(self):
+		return self.mesa.numero
+
+class DetalleActaRegional(models.Model):
+	acta = models.ForeignKey(ActaRegional)
+	partido = models.ForeignKey(Partido)
+	votos_pres = models.IntegerField()
+	votos_cons = models.IntegerField()
+	
+	class Meta:
+		unique_together = (('acta', 'partido'),)
+
+	def __str__(self):
+		return self.acta.mesa.numero+" "+self.partido.nombre
+
+class DisenioActaMunicipal(models.Model):
 	nombre = models.CharField(max_length=50)
 	distrito = models.ForeignKey(Distrito)
 
 	def __str__(self):
 		return self.nombre
 
-class DetalleDisenioActa(models.Model):
-	disenio_acta = models.ForeignKey(DisenioActa)
+class DetalleDisenioActaMunicipal(models.Model):
+	disenio_acta = models.ForeignKey(DisenioActaMunicipal)
 	partido = models.ForeignKey(Partido)
 	distrital = models.BooleanField(default=False)
 	provincial = models.BooleanField(default=False)
+
+	def __str__(self):
+		return self.partido.nombre
+
+class DisenioActaRegional(models.Model):
+	nombre = models.CharField(max_length=50)
+	region = models.ForeignKey(Region)
+
+	def __str__(self):
+		return self.nombre
+
+class DetalleDisenioActaRegional(models.Model):
+	disenio_acta = models.ForeignKey(DisenioActaRegional)
+	partido = models.ForeignKey(Partido)
+	presidente = models.BooleanField(default=False)
+	consejero = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.partido.nombre

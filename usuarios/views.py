@@ -13,7 +13,7 @@ def Login(request):
 		if usuario is not None:
 			if usuario.is_active:
 				login(request, usuario)
-				return HttpResponseRedirect(reverse('actas:mesa'))				
+				return HttpResponseRedirect(reverse('actas:mesa_municipal'))				
 			else:
 				return HttpResponseRedirect(reverse('usuarios:login'))				
 		else:

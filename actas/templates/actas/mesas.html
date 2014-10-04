@@ -7,8 +7,9 @@
                 <th>MESA</th>
                 <th>CENTRO VOTACION</th>
                 <th>DISTRITO</th>
-                <th>NRO ELECTORES</th>
-                <th>PROCESAMIENTO</th>
+                <th>N ELEC.</th>
+                <th>MUNICIPAL</th>
+                <th>REGIONAL</th>
                 <th>VER</th>
                 <th>EDITAR</th>
             </tr>
@@ -20,11 +21,16 @@
                 <td>{{ mesa.centro_votacion }}</td>
                 <td>{{ mesa.centro_votacion.distrito }}</td>
                 <td>{{ mesa.total_electores  }}</td>
-                {% if mesa.procesada  %}
-                    <td>MESA PROCESADA</td>
+                {% if mesa.procesada_municipal  %}
+                    <td>PROCESADA</td>
                 {% else %}
-                    <td>MESA SIN PROCESAR</td>
+                    <td>SIN PROCESAR</td>
                 {% endif %}                
+                {% if mesa.procesada_regional  %}
+                    <td>PROCESADA</td>
+                {% else %}
+                    <td>SIN PROCESAR</td>
+                {% endif %}
                 <td>
                     <a class="btn btn-small" href="#">
                         <i class="icon-eye-open"></i>

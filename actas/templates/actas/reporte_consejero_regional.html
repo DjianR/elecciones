@@ -1,0 +1,34 @@
+{% extends "actas/base.html" %}
+
+{% block main_content %}
+<table class="table table-striped">
+        <tbhead>
+            <tr>
+                <th>PARTIDO</th>
+                <th>REGION</th>
+                <th>VOTACION</th>
+                <th>DETALLE</th>
+            </tr>
+        </tbhead>
+        <tbody>
+        {% for votos_partido in votos_partidos %}
+            <tr>
+                <td>{{ votos_partido.partido }}</td>
+                <td>{{ votos_partido.provincia }}</td>
+                <td>{{ votos_partido.votos }}</td>
+                <td>
+                    <a class="btn btn-small" href="#">
+                        <i class="icon-eye-open"></i>
+                    </a>
+                </td>
+            </tr>        
+        {% endfor %}
+            <tr>
+                <td>TOTAL</td>
+                <td></td>
+                <td>{{ total }}</td>                
+            </tr>
+    </tbody>
+</table>
+<a href="#">Exportar a Excel</a>
+{% endblock main_content %}

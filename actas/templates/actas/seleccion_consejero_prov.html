@@ -1,0 +1,73 @@
+{% extends "actas/base.html" %}
+
+{% block main_content %}
+
+	<form action="{% url 'actas:seleccion_prov_consejero' %}" method="post" class="form-control">
+		{% csrf_token %}
+		<legend>SELECCIONE LA PROVINCIA</legend>		
+		<div class="row-fluid">
+			<div class="span3">
+			</div>
+			<div class="span3">
+				Region: 
+				<select id="regiones" name="regiones">
+					<option>Elige una región</option>
+					{% for region in regiones %}
+						<option value="{{ region.id }}">{{ region.nombre }}</option>
+					{% endfor %}}
+				</select>
+			</div>
+			<div class="span3">
+				Provincia: 
+				<select id="provincias" name="provincias">
+					<option>Elige una provincia</option>
+				</select>
+			</div>			
+		</div>
+		<div class="span4">
+		</div>
+		<div class="span4">
+			<input class="btn" type="submit" value="Siguiente">
+		</div>			
+	</form>
+
+{% endblock main_content %}
+
+{% block js %}
+	<script>
+	$('#regiones').on('change',busquedaProvincias);
+	function busquedaProvincias(){
+		var region = $('#regiones').val();
+		$("#provincias").empty();
+		$("#provincias").append("<option>Elige una provincia</option>");
+		$.ajax({
+			data : {'region': region},
+			url : '{% url 'actas:busquedaProvincias' %}',
+			type : 'get',
+			success : function(data){
+				$.each(data, function(i,item){
+            		$("#provincias").append("<option value=\""+item.pk+"\">"+item.fields.nombre+"</option>");
+        		});
+			}
+		});
+	}
+
+	$('#provincias').on('change',busquedaDistritos);
+	function busquedaDistritos(){
+		var provincia = $('#provincias').val();
+		$("#distritos").empty();
+		$("#distritos").append("<option>Elige un distrito</option>");
+		$.ajax({
+			data : {'provincia': provincia},
+			url : '{% url 'actas:busquedaDistritos' %}',
+			type : 'get',
+			success : function(data){
+				$.each(data, function(i,item){
+            		$("#distritos").append("<option value=\""+item.pk+"\">"+item.fields.nombre+"</option>");
+        		});
+			}
+		});
+	}
+	
+	</script>
+{% endblock js %}

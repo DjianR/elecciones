@@ -2,7 +2,7 @@
 
 {% block main_content %}
 
-	<form action="{% url 'actas:acta' mesa.numero %}" method="post" class="form-control">
+	<form action="{% url 'actas:acta_municipal' mesa.numero %}" method="post" class="form-control">
 		{% csrf_token %}
 		<legend>ACTA ELECTORAL</legend>		
 		<div class="row-fluid">
