@@ -16,6 +16,7 @@
                 <td>{{ votos_partido.partido }}</td>
                 <td>{{ votos_partido.region }}</td>
                 <td>{{ votos_partido.votos }}</td>
+                <td>{{ votos_partido.porcentaje }}</td>
                 <td>
                     <a class="btn btn-small" href="#">
                         <i class="icon-eye-open"></i>
@@ -23,6 +24,11 @@
                 </td>
             </tr>        
         {% endfor %}
+            <tr>
+                <td>TOTAL</td>
+                <td></td>
+                <td>{{ total }}</td>                
+            </tr>
     </tbody>
 </table>
 <a href="{% url 'actas:exportar_reporte_regional' region %}">Exportar a Excel</a>

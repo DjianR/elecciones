@@ -30,7 +30,6 @@
 		        <tbhead>
 		            <tr>
 		                <th>PARTIDO</th>
-		                <th>REGIONAL</th>
 		                <th>PROVINCIAL</th>
 		                <th>DISTRITAL</th>		                
 		            </tr>
@@ -42,9 +41,6 @@
 			                	{{ detalle.partido }}
 			                </td>
 			                <td>
-		                		{{ detalle.votos_regional }}
-		                	</td>
-		                	<td>
 		                		{{ detalle.votos_provincial }}
 		                	</td>
 		                  	<td>
@@ -55,9 +51,6 @@
 						<tr>
 							<td>
 			                	VOTOS EN BLANCO:
-			                </td>
-			                <td>
-			                	{{ acta.votos_blancos_reg }}
 			                </td>
 			                <td>
 			                	{{ acta.votos_blancos_prov }}
@@ -71,9 +64,6 @@
 			                	VOTOS NULOS:
 			                </td>
 			                <td>
-			                	{{ acta.votos_nulos_reg }}
-			                </td>
-			                <td>
 			                	{{ acta.votos_nulos_prov }}
 			                </td>
 			                <td>
@@ -85,9 +75,6 @@
 			                	VOTOS IMPUGNADOS:
 			                </td>
 			                <td>
-			                	{{ acta.votos_impugnados_reg }}
-			                </td>
-			                <td>
 			                	{{ acta.votos_impugnados_prov }}
 			                </td>
 			                <td>
@@ -97,9 +84,6 @@
 						<tr>
 							<td>
 			                	TOTAL DE VOTOS:
-			                </td>
-			                <td>
-			                	{{ acta.votos_emitidos_reg }}
 			                </td>
 			                <td>
 			                	{{ acta.votos_emitidos_prov }}

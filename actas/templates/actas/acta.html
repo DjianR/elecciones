@@ -32,7 +32,6 @@
 		        <tbhead>
 		            <tr>
 		                <th>PARTIDO</th>
-		                <th>REGIONAL</th>
 		                <th>PROVINCIAL</th>
 		                <th>DISTRITAL</th>		                
 		            </tr>
@@ -41,16 +40,7 @@
 					{% for detalle in detalles %}
 						<tr>
 			                <td>{{ detalle.partido }}</td>
-			                {% if detalle.regional%}
-			                	<td>
-			                		<input type="number" name="reg_{{ detalle.partido.pk }}" id="reg_{{ detalle.partido.pk }}" min="0" max="{{ mesa.total_electores }}" value="0" class="regional"/>
-			                	</td>
-			                {% else %}
-			                	<td>
-			                		<input type="text" name="reg_{{ detalle.partido.pk }}" id="reg_{{ detalle.partido.pk }}" value="NO TIENE LISTA" readonly/>
-			                	</td>
-			                {% endif %}
-			                {% if detalle.provincial%}
+			               	{% if detalle.provincial%}
 			                	<td>
 			                		<input type="number" name="prov_{{ detalle.partido.pk }}" id="prov_{{ detalle.partido.pk }}" min="0" max="{{ mesa.total_electores }}" value="0" class="provincial"/>
 			                	</td>
@@ -73,10 +63,7 @@
 						<tr>
 							<td>
 								VOTOS EN BLANCO:
-							</td>
-							<td>
-								<input type="number" name="voto_blanco_reg" id="voto_blanco_reg" min="0" max="{{ mesa.total_electores }}" value="0" class="regional"/>	
-							</td>
+							</td>							
 							<td>
 								<input type="number" name="voto_blanco_prov" id="voto_blanco_prov" min="0" max="{{ mesa.total_electores }}" value="0" class="provincial"/>	
 							</td>
@@ -97,9 +84,6 @@
 								VOTOS NULOS:
 							</td>
 							<td>
-								<input type="number" name="voto_nulo_reg" id="voto_nulo_reg" min="0" max="{{ mesa.total_electores }}" value="0" class="regional"/>	
-							</td>
-							<td>
 								<input type="number" name="voto_nulo_prov" id="voto_nulo_prov" min="0" max="{{ mesa.total_electores }}" value="0" class="provincial"/>	
 							</td>
 							{% if not distrito.capital_provincia %}
@@ -115,9 +99,6 @@
 						<tr>
 							<td>
 								VOTOS IMPUGNADOS:
-							</td>
-							<td>
-								<input type="number" name="voto_impugnado_reg" id="voto_impugnado_reg" min="0" max="{{ mesa.total_electores }}" value="0" class="regional"/>	
 							</td>
 							<td>
 								<input type="number" name="voto_impugnado_prov" id="voto_impugnado_prov" min="0" max="{{ mesa.total_electores }}" value="0" class="provincial"/>	
@@ -137,14 +118,11 @@
 								TOTAL DE VOTOS EMITIDOS:
 							</td>
 							<td>
-								<input type="number" name="voto_total_regional" id="voto_total_regional" value="0"/>	
-							</td>
-							<td>
-								<input type="number" name="voto_total_provincial" id="voto_total_provincial" value="0"/>	
+								<input type="number" name="voto_total_provincial" id="voto_total_provincial" value="0" readonly class="total"/>	
 							</td>
 							{% if not distrito.capital_provincia %}
 			                	<td>
-									<input type="number" name="voto_total_distrital" id="voto_total_distrital" value="0"/>	
+									<input type="number" name="voto_total_distrital" id="voto_total_distrital" value="0" readonly class="total"/>	
 								</td>
 			                {% else %}
 			                	<td>
@@ -168,9 +146,12 @@
 			<div class="span4">
 			</div>
 			<div class="span4">
-				<input class="btn btn-primary" type="submit" value="Guardar Acta">
+				<input class="btn btn-primary" type="submit" id="guardar" name="guardar" value="Guardar Acta">
 			</div>
-		</div>			
+		</div>		
+		<div id="dialog" title="Error en el Total de Votos">
+			<p>Error, el total de votos no puede ser mayor que el número de votantes</p>
+		</div>	
 	</form>
 
 {% endblock main_content %}
@@ -178,7 +159,6 @@
 {% block js %}
 	<script>
 	
-	$('.regional').on('keyup',validarNumeros);
 	$('.provincial').on('keyup',validarNumeros);
 	$('.distrital').on('keyup',validarNumeros);
 
@@ -186,14 +166,6 @@
 		this.value = this.value.replace(/[^0-9]/g,'');
 	}	
 
-	$('.regional').on('change',totalRegional);
-	function totalRegional(){
-		var total_regional = 0;
-		$(".regional").each(function(){
-			total_regional = total_regional + eval($(this).val()); 
-		});
-		$("#voto_total_regional").val(total_regional);
-	}
 	$('.provincial').on('change',totalProvincial);
 	function totalProvincial(){
 		var total_provincial = 0;
@@ -212,5 +184,52 @@
 		$("#voto_total_distrital").val(total_distrital);
 	}	
 	
+	$("#dialog").dialog({
+            autoOpen : false,
+            resizable : false,
+            width : 200,
+            height:200,
+            modal : true,
+            buttons: {
+                "Cerrar" : function(){
+                    $( this ).dialog( "close" );
+                }
+            },
+            close : function(ev, ui) {
+                return true;    
+            }
+        });
+
+	$('#guardar').on('mouseover',validarTotal);
+	$('#guardar').on('focus',validarTotal);
+	function validarTotal(){
+		var total_provincial=eval($("#voto_total_provincial").val());		
+		var total_electores = {{ mesa.total_electores }};
+		if ($('#voto_total_distrital').is(':disabled')) 
+		{
+			var total_distrital=total_electores;	
+		}
+		else
+		{
+			var total_distrital=eval($("#voto_total_distrital").val());
+		}
+
+		if(total_provincial>total_electores)
+		{
+			$( "#dialog" ).dialog("open");
+		}
+		else
+		{
+			if(total_distrital>total_electores)
+			{
+				$( "#dialog" ).dialog("open");
+			}
+			else
+			{
+			
+			}
+		}
+	}
+
 	</script>
 {% endblock js %}

@@ -24,6 +24,47 @@
                 </td>
             </tr>        
         {% endfor %}
+            <tr>
+                <td>
+                    VOTOS EN BLANCO:
+                </td>
+                <td>
+                </td>
+                <td>
+                    {{ total_vb.votos_blancos_dis__sum }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    VOTOS NULOS:
+                </td>
+                <td>
+                </td>
+                <td>
+                    {{ total_vn.votos_nulos_dis__sum }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    VOTOS IMPUGNADOS:
+                </td>
+                <td>
+                </td>
+                <td>
+                    {{ total_vi.votos_impugnados_dis__sum }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    TOTAL VOTOS:
+                </td>
+                <td>
+                </td>
+                <td>
+                    {{ total_votos }}
+                </td>
+            </tr>
+            
     </tbody>
 </table>
 <a href="{% url 'actas:exportar_reporte_distrital' distrito %}">Exportar a Excel</a>

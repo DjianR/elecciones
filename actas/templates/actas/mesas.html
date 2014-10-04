@@ -11,7 +11,6 @@
                 <th>PROCESAMIENTO</th>
                 <th>VER</th>
                 <th>EDITAR</th>
-                <th>ELIMINAR</th>
             </tr>
         </tbhead>
         <tbody>
@@ -36,14 +35,23 @@
                         <i class="icon-pencil"></i>
                     </a>
                 </td>
-                <td>
-                    <a class="btn btn-small" href="#">
-                        <i class="icon-trash"></i>
-                    </a>
-                </td>
             </tr>        
         {% endfor %}
     </tbody>
 </table>
 <a href="{% url 'actas:exportar_mesas' %}">Exportar a Excel</a>
+<hr>
+<div>
+    <span>
+        {% if mesas.has_previous %}
+            <a href="?pagina={{ mesas.previous_page_number }}">Anterior</a>
+        {% endif %}
+            <span>
+            {{ mesas.number }} de {{ mesas.paginator.num_pages }}.
+            </span>
+        {% if mesas.has_next %}
+            <a href="?pagina={{ mesas.next_page_number }}">Siguiente</a>
+        {% endif %}
+    </span>
+</div>
 {% endblock main_content %}

@@ -1,0 +1,4 @@
+127.0.0.1 - - [30/Sep/2014:01:59:39 -0500] "GET / HTTP/1.1" 403 142 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:32.0) Gecko/20100101 Firefox/32.0"
+127.0.0.1 - - [30/Sep/2014:01:59:39 -0500] "GET /favicon.ico HTTP/1.1" 403 142 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:32.0) Gecko/20100101 Firefox/32.0"
+127.0.0.1 - - [30/Sep/2014:02:16:45 -0500] "GET / HTTP/1.1" 403 142 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:32.0) Gecko/20100101 Firefox/32.0"
+127.0.0.1 - - [30/Sep/2014:02:18:48 -0500] "GET / HTTP/1.1" 403 142 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:32.0) Gecko/20100101 Firefox/32.0"

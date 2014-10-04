@@ -5,6 +5,8 @@ from django.core import serializers
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 import csv
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Sum
 
 # Create your views here.
 def mesa(request):
@@ -32,10 +34,6 @@ def acta(request, numero):
 	detalles = DetalleDisenioActa.objects.filter(disenio_acta=disenio_acta)
 	
 	if request.method == 'POST':
-		votos_blancos_reg = request.POST['voto_blanco_reg']
-		votos_nulos_reg = request.POST['voto_nulo_reg']
-		votos_imp_reg = request.POST['voto_impugnado_reg']
-		votos_tot_reg = request.POST['voto_total_regional']
 		votos_blancos_prov = request.POST['voto_blanco_prov']
 		votos_nulos_prov = request.POST['voto_nulo_prov']
 		votos_imp_prov = request.POST['voto_impugnado_prov']
@@ -52,29 +50,23 @@ def acta(request, numero):
 			votos_imp_dis = 0
 			votos_tot_dis = 0
 
-		acta = Acta(mesa=mesa,votos_blancos_reg=votos_blancos_reg,votos_blancos_prov=votos_blancos_prov,
-			votos_blancos_dis=votos_blancos_dis,votos_nulos_reg=votos_nulos_reg,votos_nulos_prov=votos_nulos_prov,
-			votos_nulos_dis=votos_nulos_dis,votos_impugnados_reg=votos_imp_reg,
+		acta = Acta(mesa=mesa,votos_blancos_prov=votos_blancos_prov,votos_blancos_dis=votos_blancos_dis,
+			votos_nulos_prov=votos_nulos_prov,votos_nulos_dis=votos_nulos_dis,
 			votos_impugnados_prov=votos_imp_prov,votos_impugnados_dis=votos_imp_dis,
-			votos_emitidos_reg=votos_tot_reg,votos_emitidos_prov=votos_tot_prov,votos_emitidos_dis=votos_tot_dis)
+			votos_emitidos_prov=votos_tot_prov,votos_emitidos_dis=votos_tot_dis)
 		acta.save()
 		for detalle in detalles:
-			reg = "reg_"+str(detalle.partido.pk)
-			votos_regional = request.POST[reg]
 			prov = "prov_"+str(detalle.partido.pk)
 			votos_provincial = request.POST[prov]
 			dis = "dis_"+str(detalle.partido.pk)
 			votos_distrital = request.POST[dis]
 			
-			if not votos_regional.isnumeric():
-				votos_regional=0
-			else:
-				try:
-					vot_reg = VotacionRegional.objects.get(partido=detalle.partido, region=region)
-				except VotacionRegional.DoesNotExist:
-					vot_reg = VotacionRegional(partido=detalle.partido, region=region)
-				vot_reg.votos = vot_reg.votos + int(votos_regional)
-				vot_reg.save()
+			try:
+				detalle_acta = DetalleActa.objects.get(acta=acta,partido=detalle.partido)
+			except DetalleActa.DoesNotExist:
+				detalle_acta = DetalleActa(acta=acta,partido=detalle.partido)
+				detalle_acta.votos_provincial = 0
+				detalle_acta.votos_distrital = 0
 
 			if not votos_provincial.isnumeric():
 				votos_provincial=0
@@ -83,7 +75,7 @@ def acta(request, numero):
 					vot_prov = VotacionProvincial.objects.get(partido=detalle.partido, provincia=provincia)
 				except VotacionProvincial.DoesNotExist:
 					vot_prov = VotacionProvincial(partido=detalle.partido, provincia=provincia)
-				vot_prov.votos = vot_prov.votos + int(votos_provincial)
+				vot_prov.votos = vot_prov.votos + int(votos_provincial) - detalle_acta.votos_provincial
 				vot_prov.save()
 				
 			if not votos_distrital.isnumeric():
@@ -93,11 +85,12 @@ def acta(request, numero):
 					vot_dis = VotacionDistrital.objects.get(partido=detalle.partido, distrito=distrito)
 				except VotacionDistrital.DoesNotExist:
 					vot_dis = VotacionDistrital(partido=detalle.partido, distrito=distrito)
-				vot_dis.votos = vot_dis.votos + int(votos_distrital)
+				vot_dis.votos = vot_dis.votos + int(votos_distrital) - detalle_acta.votos_distrital
 				vot_dis.save()
-
-			detalle_acta = DetalleActa(acta=acta,partido=detalle.partido,votos_regional=votos_regional,
-				votos_provincial=votos_provincial,votos_distrital=votos_distrital)
+			
+			
+			detalle_acta.votos_provincial=votos_provincial
+			detalle_acta.votos_distrital=votos_distrital
 			detalle_acta.save()
 		mesa.procesada=True
 		mesa.save()
@@ -143,13 +136,29 @@ class BusquedaMesas(TemplateView):
 
 def actas(request):
     actas = Acta.objects.all()
+    paginador = Paginator(actas, 10) 
+    pagina = request.GET.get('pagina')
+    try:
+    	actas = paginador.page(pagina)
+    except PageNotAnInteger:      
+        actas = paginador.page(1)
+    except EmptyPage:      
+        actas = paginador.page(paginador.num_pages)       
     context = {'actas':actas}
     return render(request, 'actas/actas.html', context)
 
-class Mesas(ListView):
-    model = Mesa
-    template_name = "actas/mesas.html"
-    context_object_name = "mesas"
+def mesas(request):
+    mesas = Mesa.objects.all().order_by('centro_votacion','numero')
+    paginador = Paginator(mesas, 10) 
+    pagina = request.GET.get('pagina')
+    try:
+    	mesas = paginador.page(pagina)
+    except PageNotAnInteger:      
+        mesas = paginador.page(1)
+    except EmptyPage:      
+        mesas = paginador.page(paginador.num_pages)       
+    context = {'mesas':mesas}
+    return render(request, 'actas/mesas.html', context)
 
 def detalle_acta(request,acta):
 	obj_acta = Acta.objects.get(pk=acta)
@@ -208,19 +217,32 @@ def seleccion_region(request):
 	return render(request, 'actas/seleccion_region.html', context)
 
 def reporte_regional(request, region):
-	votos_partidos = VotacionRegional.objects.filter(region=region)
-	context = {'votos_partidos':votos_partidos, 'region':region}
+	total = 0
+	votos_partidos = VotacionRegional.objects.filter(region=region).order_by('-votos')
+	for votos_partido in votos_partidos:
+		total = total + votos_partido.votos
+	context = {'votos_partidos':votos_partidos, 'region':region,'total':total}
 	return render(request, 'actas/reporte_regional.html', context)
 
 def reporte_provincial(request, provincia):
-	votos_partidos = VotacionProvincial.objects.filter(provincia=provincia)
-	context = {'votos_partidos':votos_partidos,'provincia':provincia}
+	total_vb = Acta.objects.filter(mesa=Mesa.objects.filter(centro_votacion=CentroVotacion.objects.filter(distrito=Distrito.objects.filter(provincia=provincia)))).aggregate(Sum('votos_blancos_prov'))
+	total_vn = Acta.objects.filter(mesa=Mesa.objects.filter(centro_votacion=CentroVotacion.objects.filter(distrito=Distrito.objects.filter(provincia=provincia)))).aggregate(Sum('votos_nulos_prov'))
+	total_vi = Acta.objects.filter(mesa=Mesa.objects.filter(centro_votacion=CentroVotacion.objects.filter(distrito=Distrito.objects.filter(provincia=provincia)))).aggregate(Sum('votos_impugnados_prov'))
+	total_vv = VotacionProvincial.objects.filter(provincia=provincia).aggregate(Sum('votos'))
+	total_votos = total_vv['votos__sum']+total_vb['votos_blancos_prov__sum']+total_vn['votos_nulos_prov__sum']+total_vi['votos_impugnados_prov__sum']
+	votos_partidos = VotacionProvincial.objects.filter(provincia=provincia).order_by('-votos')
+	context = {'votos_partidos':votos_partidos,'provincia':provincia,'total_votos':total_votos,'total_vb':total_vb,'total_vn':total_vn,'total_vi':total_vi}
 	return render(request, 'actas/reporte_provincial.html', context)
 
 def reporte_distrital(request, distrito):
 	distrito_obj = Distrito.objects.get(pk=distrito)
-	votos_partidos = VotacionDistrital.objects.filter(distrito=distrito_obj)
-	context = {'votos_partidos':votos_partidos,'distrito':distrito}
+	total_vb = Acta.objects.filter(mesa=Mesa.objects.filter(centro_votacion=CentroVotacion.objects.filter(distrito=distrito))).aggregate(Sum('votos_blancos_dis'))
+	total_vn = Acta.objects.filter(mesa=Mesa.objects.filter(centro_votacion=CentroVotacion.objects.filter(distrito=distrito))).aggregate(Sum('votos_nulos_dis'))
+	total_vi = Acta.objects.filter(mesa=Mesa.objects.filter(centro_votacion=CentroVotacion.objects.filter(distrito=distrito))).aggregate(Sum('votos_impugnados_dis'))
+	total_vv = VotacionDistrital.objects.filter(distrito=distrito_obj).aggregate(Sum('votos'))
+	total_votos = total_vv['votos__sum']+total_vb['votos_blancos_dis__sum']+total_vn['votos_nulos_dis__sum']+total_vi['votos_impugnados_dis__sum']
+	votos_partidos = VotacionDistrital.objects.filter(distrito=distrito_obj).order_by('-votos')
+	context = {'votos_partidos':votos_partidos,'distrito':distrito,'total_votos':total_votos,'total_vb':total_vb,'total_vn':total_vn,'total_vi':total_vi}
 	return render(request, 'actas/reporte_distrital.html', context)
 			
 def exportar_reporte_regional(request, region):
@@ -229,7 +251,7 @@ def exportar_reporte_regional(request, region):
 
 	writer = csv.writer(response)
 	writer.writerow(['PARTIDO', 'REGION', 'VOTACION'])
-	votos_partidos = VotacionRegional.objects.filter(region=region)
+	votos_partidos = VotacionRegional.objects.filter(region=region).order_by('-votos')
 	for votos_partido in votos_partidos:
 		writer.writerow([votos_partido.partido, votos_partido.region, votos_partido.votos])
 	return response
@@ -240,7 +262,7 @@ def exportar_reporte_provincial(request, provincia):
 
 	writer = csv.writer(response)
 	writer.writerow(['PARTIDO', 'PROVINCIA', 'VOTACION'])
-	votos_partidos = VotacionProvincial.objects.filter(provincia=provincia)
+	votos_partidos = VotacionProvincial.objects.filter(provincia=provincia).order_by('-votos')
 	for votos_partido in votos_partidos:
 		writer.writerow([votos_partido.partido, votos_partido.provincia, votos_partido.votos])
 	return response
@@ -251,7 +273,7 @@ def exportar_reporte_distrital(request, distrito):
 
 	writer = csv.writer(response)
 	writer.writerow(['PARTIDO', 'DISTRITO', 'VOTACION'])
-	votos_partidos = VotacionDistrital.objects.filter(distrito=distrito)
+	votos_partidos = VotacionDistrital.objects.filter(distrito=distrito).order_by('-votos')
 	for votos_partido in votos_partidos:
 		writer.writerow([votos_partido.partido, votos_partido.distrito, votos_partido.votos])
 	return response
