@@ -324,19 +324,24 @@ def seleccion_region(request):
 	return render(request, 'actas/seleccion_region.html', context)
 
 def reporte_presidente_regional(request, region):
-	total = 0
+	total_vb = ActaRegional.objects.filter(mesa=Mesa.objects.filter(centro_votacion=CentroVotacion.objects.filter(distrito=Distrito.objects.filter(provincia=Provincia.objects.filter(region=region))))).aggregate(Sum('votos_blancos_pres'))
+	total_vn = ActaRegional.objects.filter(mesa=Mesa.objects.filter(centro_votacion=CentroVotacion.objects.filter(distrito=Distrito.objects.filter(provincia=Provincia.objects.filter(region=region))))).aggregate(Sum('votos_nulos_pres'))
+	total_vi = ActaRegional.objects.filter(mesa=Mesa.objects.filter(centro_votacion=CentroVotacion.objects.filter(distrito=Distrito.objects.filter(provincia=Provincia.objects.filter(region=region))))).aggregate(Sum('votos_impugnados_pres'))
+	total_vv = VotacionConsejeroRegional.objects.filter(provincia=Provincia.objects.filter(region=region)).aggregate(Sum('votos'))
+	total_votos = total_vv['votos__sum']+total_vb['votos_blancos_pres__sum']+total_vn['votos_nulos_pres__sum']+total_vi['votos_impugnados_pres__sum']
 	votos_partidos = VotacionPresidenteRegional.objects.filter(region=region).order_by('-votos')
-	for votos_partido in votos_partidos:
-		total = total + votos_partido.votos
-	context = {'votos_partidos':votos_partidos, 'region':region,'total':total}
+	context = {'votos_partidos':votos_partidos, 'region':region,'total_votos':total_votos,'total_vb':total_vb,'total_vn':total_vn,'total_vi':total_vi}
 	return render(request, 'actas/reporte_presidente_regional.html', context)
 
 def reporte_consejero_regional(request, provincia):
-	total = 0
+	total_vb = ActaRegional.objects.filter(mesa=Mesa.objects.filter(centro_votacion=CentroVotacion.objects.filter(distrito=Distrito.objects.filter(provincia=provincia)))).aggregate(Sum('votos_blancos_cons'))
+	total_vn = ActaRegional.objects.filter(mesa=Mesa.objects.filter(centro_votacion=CentroVotacion.objects.filter(distrito=Distrito.objects.filter(provincia=provincia)))).aggregate(Sum('votos_nulos_cons'))
+	total_vi = ActaRegional.objects.filter(mesa=Mesa.objects.filter(centro_votacion=CentroVotacion.objects.filter(distrito=Distrito.objects.filter(provincia=provincia)))).aggregate(Sum('votos_impugnados_cons'))
+	total_vv = VotacionConsejeroRegional.objects.filter(provincia=provincia).aggregate(Sum('votos'))
+	total_votos = total_vv['votos__sum']+total_vb['votos_blancos_cons__sum']+total_vn['votos_nulos_cons__sum']+total_vi['votos_impugnados_cons__sum']
 	votos_partidos = VotacionConsejeroRegional.objects.filter(provincia=provincia).order_by('-votos')
-	for votos_partido in votos_partidos:
-		total = total + votos_partido.votos
-	context = {'votos_partidos':votos_partidos, 'provincia':provincia,'total':total}
+
+	context = {'votos_partidos':votos_partidos, 'provincia':provincia,'total_votos':total_votos,'total_vb':total_vb,'total_vn':total_vn,'total_vi':total_vi}
 	return render(request, 'actas/reporte_consejero_regional.html', context)
 
 def reporte_provincial(request, provincia):
