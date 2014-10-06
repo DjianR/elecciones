@@ -43,7 +43,7 @@ def acta_regional(request, numero):
 		disenio_acta = DisenioActaRegional.objects.get(region=region)
 	except DisenioActaRegional.DoesNotExist:
 		return HttpResponseRedirect(reverse('admin:login'))
-	detalles = DetalleDisenioActaRegional.objects.filter(disenio_acta=disenio_acta)
+	detalles = DetalleDisenioActaRegional.objects.filter(disenio_acta=disenio_acta).order_by('id')
 	if request.method == 'POST':
 		votos_blancos_pres = request.POST['voto_blanco_pres']
 		votos_nulos_pres = request.POST['voto_nulo_pres']
