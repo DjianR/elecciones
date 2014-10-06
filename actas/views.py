@@ -111,7 +111,7 @@ def acta_municipal(request, numero):
 		disenio_acta = DisenioActaMunicipal.objects.get(distrito=distrito)
 	except DisenioActaMunicipal.DoesNotExist:
 		return HttpResponseRedirect(reverse('admin:login'))
-	detalles = DetalleDisenioActaMunicipal.objects.filter(disenio_acta=disenio_acta)
+	detalles = DetalleDisenioActaMunicipal.objects.filter(disenio_acta=disenio_acta).order_by('id')
 	
 	if request.method == 'POST':
 		votos_blancos_prov = request.POST['voto_blanco_prov']
